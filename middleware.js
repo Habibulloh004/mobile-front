@@ -1,37 +1,44 @@
 import { NextResponse } from "next/server";
 
 export function middleware(request) {
-  // Get the path
-  const path = request.nextUrl.pathname;
+  const { pathname } = request.nextUrl;
+  const token = request.cookies.get("token")?.value;
 
-  // Define public paths that don't require authentication
-  const isPublicPath = path === "/sign-in" || path === "/admin-login";
+  // 1. Agar foydalanuvchi /sign-in yoki /admin-login da bo'lsa va token bo'lsa => /dashboard ga yo'naltir
+  if ((pathname === "/sign-in" || pathname === "/admin-login") && token) {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
 
-  // For handling static assets and API routes
+  // 2. Agar foydalanuvchi `/` yoki `/dashboard`dagi sahifalarga kirsa, lekin token bo'lmasa => /sign-in ga yo'naltir
+  const isDashboardPath = pathname === "/" || pathname.startsWith("/dashboard");
+
+  if (isDashboardPath && !token) {
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+  if (pathname == "/") {
+    return NextResponse.redirect(new URL("/dashboard", request.url));
+  }
+
+  // 3. Static files va APIlar uchun ruxsat
   if (
-    path.includes("_next") ||
-    path.includes("/api/") ||
-    path.includes("favicon.ico") ||
-    path.includes("/uploads/")
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes("favicon.ico") ||
+    pathname.startsWith("/uploads")
   ) {
     return NextResponse.next();
   }
 
-  // Note: In middleware, we can't access localStorage directly
-  // The client-side components will handle redirects based on auth state
-  // This approach works for SSR, but client-side JS will handle auth checks too
-
-  // For public paths, let Next.js handle routing
-  if (isPublicPath) {
-    return NextResponse.next();
-  }
-
-  // For protected paths, we'll redirect to login when the client detects no auth
-  // But the middleware will also continue to allow the initial load
+  // 4. Agar yuqoridagilardan birortasi bo'lmasa => davomi
   return NextResponse.next();
 }
 
-// Define paths that will trigger the middleware
 export const config = {
-  matcher: ["/((?!_next|api|favicon.ico|uploads).*)"],
+  matcher: [
+    /*
+     * faqat kerakli route'larda middleware ishga tushadi
+     * bu yerda static fayllar, API va uploads chetlab o'tiladi
+     */
+    "/((?!_next|api|favicon.ico|uploads).*)",
+  ],
 };

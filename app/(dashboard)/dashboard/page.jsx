@@ -62,8 +62,9 @@ export default function Page() {
         setLoading(false);
       }
     }
-
-    fetchDashboardData();
+    if (user) {
+      fetchDashboardData();
+    }
   }, [user]);
 
   if (loading) {

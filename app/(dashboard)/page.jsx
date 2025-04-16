@@ -58,8 +58,9 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
-
-    fetchDashboardData();
+    if (user) {
+      fetchDashboardData();
+    }
   }, [user]);
 
   if (loading) {

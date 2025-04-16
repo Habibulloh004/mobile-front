@@ -13,6 +13,7 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import Cookies from "js-cookie";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -34,8 +35,9 @@ export function Sidebar() {
   }, [pathname]);
 
   const handleLogout = () => {
+    Cookies.remove("token");
+    Cookies.remove("role");
     logout();
-    window.location.href = "/sign-in";
   };
 
   const toggleSubmenu = (menu) => {
@@ -160,13 +162,14 @@ export function Sidebar() {
       </div>
 
       <div className="mt-auto p-4 border-t">
-        <button
+        <Link
+          href={"/sign-in"}
           onClick={handleLogout}
           className="flex items-center px-4 py-2 text-sm text-red-600 rounded-md hover:bg-red-50 w-full"
         >
           <LogOut size={20} />
           <span className="ml-3">Logout</span>
-        </button>
+        </Link>
       </div>
     </div>
   );

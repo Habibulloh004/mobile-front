@@ -17,6 +17,8 @@ export const useAuthStore = create(
         try {
           set({ isLoading: true, error: null });
           const response = await authAPI.superAdminLogin(login, password);
+          console.log(response, "super admin login api");
+
           const { token, user } = response.data.data;
 
           // Add role to user object
@@ -24,6 +26,7 @@ export const useAuthStore = create(
 
           // Save token in cookie (7 days expiry)
           Cookies.set("token", token, { expires: 7, path: "/" });
+          Cookies.set("role", "superadmin", { expires: 7, path: "/" });
 
           set({
             token,
@@ -56,6 +59,7 @@ export const useAuthStore = create(
 
           // Save token in cookie (7 days expiry)
           Cookies.set("token", token, { expires: 7, path: "/" });
+          Cookies.set("role", "admin", { expires: 7, path: "/" });
 
           set({
             token,
@@ -74,9 +78,8 @@ export const useAuthStore = create(
 
       // Logout
       logout: () => {
-        // Remove token from cookie
         Cookies.remove("token", { path: "/" });
-
+        Cookies.remove("role", { path: "/" });
         set({ token: null, user: null });
       },
 
@@ -87,7 +90,6 @@ export const useAuthStore = create(
     }),
     {
       name: "auth-storage", // unique name for localStorage (still useful for user data)
-      partialize: (state) => ({ user: state.user }), // only persist user info in localStorage
     }
   )
 );

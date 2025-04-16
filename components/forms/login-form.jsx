@@ -92,8 +92,11 @@ export function LoginForm() {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button
+            type="button"
             variant="outline"
-            onClick={() => router.push("/admin-login")}
+            onClick={() => {
+              router.push("/admin-login");
+            }}
             disabled={isLoading}
           >
             Admin Login

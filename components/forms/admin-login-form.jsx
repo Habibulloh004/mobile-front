@@ -108,6 +108,7 @@ export function AdminLoginForm() {
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button
+            type="button"
             variant="outline"
             onClick={() => router.push("/sign-in")}
             disabled={isLoading}
